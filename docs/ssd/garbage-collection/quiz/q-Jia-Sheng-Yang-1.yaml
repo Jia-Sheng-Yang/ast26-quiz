@@ -1,0 +1,22 @@
+author: Jia-Sheng-Yang
+date: 2026-03-09
+question: |
+  假設有一個已經使用90%容量的SSD，Host OS 想要寫入一個8KB檔案，
+  與容量幾乎未使用的SSD想比，已使用90%的在寫入過程有突然的latency spike，
+  已下哪個選項最能解釋這個latency spike。
+options:
+  - text: "GC必須將許多只有部分填滿valid page的block中讀取資料並寫到新的block，為了要得到free space"
+    correct: true
+    explanation: |
+      在不同invalid page ratio情況下write amplification的影響程度，在容量快滿的情況下，
+      就算invalid page ratio不高的block，GC也會為了要清出free space而將其選為victim block。
+  - text: "FTL必須對file system做defragmetation，以確保寫入的檔案資料放在連續的位置"
+    explanation: |
+      SSD不像傳統HDD那樣透過需要物理上透過旋轉在platter找到對的位置，FTL可以logical address轉到physical address，
+      不需要像HDD做degragmentation。
+  - text: "SSD 控制器被迫等待來自作業系統的同步 TRIM 指令，以確認哪些特定的block可以安全地覆寫"
+    explanation: |
+      TRIM 雖然能告知 SSD 哪些資料已無效以加速GC，但它通常是非同步的，SSD控制器並不會在每次寫入新資料前都停下來等待TRIM 的確認。
+  - text: "由於free space的block可能有較高p/e cycle，Dynamic Wear Leveling將cold data先移入目前free space然後才執行寫入"
+    explanation: |
+      Static Wear Leveling才會執行這種動作，Dynamic Wear Leveling只是優先使用目前free block中較少p/e cycle的。
